@@ -98,7 +98,7 @@ def chill():
 
 
 def is_valid_uuid(value):
-
+	 return True
 	 try:
 		  UUID(str(value))
 		  return True

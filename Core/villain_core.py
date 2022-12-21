@@ -892,10 +892,17 @@ class Hoaxshell(BaseHTTPRequestHandler):
 			session_id = self.headers.get(Hoaxshell.header_id)
 			
 		except:
-			session_id = None
-				
-		
+			session_id = None		
+
 		if session_id and (session_id not in Sessions_manager.active_sessions.keys()):
+			if session_id not in Sessions_manager.legit_session_ids.keys():
+				Sessions_manager.legit_session_ids[session_id] = {
+					'OS Type' : 'WINDOWS',
+					'constraint_mode' : False,
+					'frequency' : Hoaxshell_settings.default_frequency,
+					'exec_outfile' : False
+				}
+
 			if session_id in Sessions_manager.legit_session_ids.keys():
 				h = session_id.split('-')
 				Hoaxshell.verify.append(h[0])
@@ -926,17 +933,16 @@ class Hoaxshell(BaseHTTPRequestHandler):
 		
 		elif not session_id:
 			return
-					
+
 		self.server_version = Hoaxshell_settings.server_version
 		self.sys_version = ""
 		session_id = self.headers.get(Hoaxshell.header_id)
 		legit = True if session_id in Sessions_manager.legit_session_ids.keys() else False
 
-
-		# Verify execution	
+		# Verify execution
 		url_split = self.path.strip("/").split("/")
-		if url_split[0] in Hoaxshell.verify and legit:
-			
+		if url_split[0] in Hoaxshell.verify and legit:			
+
 			if Sessions_manager.active_sessions[session_id]['execution_verified']:
 				print(f'\r[{INFO}] Received "Verify execution" request from an already established session (ignored).')
 				Main_prompt.rst_prompt() if not Hoaxshell.active_shell else Hoaxshell.rst_shell_prompt()
